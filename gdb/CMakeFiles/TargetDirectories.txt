@@ -1,3 +1,0 @@
-/home/snow/work/eclipse-workspace/test/CMakeFiles/edit_cache.dir
-/home/snow/work/eclipse-workspace/test/CMakeFiles/rebuild_cache.dir
-/home/snow/work/eclipse-workspace/test/CMakeFiles/average.dir

@@ -1,1 +1,0 @@
-/usr/bin/cc     CMakeFiles/average.dir/average.c.o  -o average -rdynamic 

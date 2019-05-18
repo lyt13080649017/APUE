@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 
-int16_t average(int16_t num, ...);
+int average(int num, ...);
 
 int main(int argc, char **argv)
 {
@@ -15,22 +15,24 @@ int main(int argc, char **argv)
 				"or --version to check the version \n");
 
 		//返回码理解
-		exit(0);
+		return(0);
 	}
 
-	if(strcmp(argv[1], "--version"))
+	if(!strcmp(argv[1], "--version"))
 	{
 		printf("v1.0.0 \n");
 	}
-	else if(strcmp(argv[1], "--help"))
+	else if(!strcmp(argv[1], "--help"))
 	{
-		printf("data type should be uint16_t, first is the number of data, other is the data. \n");
+		printf("average [option] [num [data ...]] \n");
+		printf( "option: --help --version \n"
+				"number of data should equal to num. \n");
 	}
 	else
 	{
 		char **ptr;
 		uint8_t realNum = 0;
-		for(ptr = argv[2]; *argv != NULL; ptr++)
+		for(ptr = &argv[2]; *ptr != NULL; ptr++)
 		{
 			realNum++;
 		}
@@ -43,10 +45,10 @@ int main(int argc, char **argv)
 }
 
 
-int16_t average(int16_t num, ...)
+int average(int num, ...)
 {
-	int32_t sum = 0;
-	int16_t inData = 0;
+	int sum = 0;
+	int inData = 0;
 	if(num < 1)
 	{
 		//printf输出到哪里了？有那些同类函数？
@@ -56,11 +58,11 @@ int16_t average(int16_t num, ...)
 	va_list inDataPtr;
 
 	va_start(inDataPtr, num);
-	for(uint8_t i = 0; i < num; i++)
+	for(int i = 0; i < num; i++)
 	{
-		inData = va_arg(inDataPtr, int16_t);
+		inData = va_arg(inDataPtr, int);
 		sum += inData;
 	}
 	va_end(inDataPtr);
-	return (int16_t)(sum/num);
+	return (int)(sum/num);
 }

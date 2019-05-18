@@ -1,0 +1,17 @@
+Currently logging to "gdb.txt".
+Future logs will be written to gdb1.txt.
+Logs will be appended to the log file.
+Output is being logged and displayed.
+Breakpoint 1 at 0x4006ac: file average.c, line 33.
+Starting program: /home/snow/learn/linux/APUE/gdb/average 1 2 3
+
+Breakpoint 1, main (argc=4, argv=0x7fffffffdd28) at average.c:34
+34			uint8_t realNum = 0;
+35			for(ptr = &argv[2]; *ptr != NULL; ptr++)
+37				realNum++;
+35			for(ptr = &argv[2]; *ptr != NULL; ptr++)
+37				realNum++;
+35			for(ptr = &argv[2]; *ptr != NULL; ptr++)
+41			printf("arvege = %d \n", (int)average(3, 10, 20, 30));
+Continuing.
+[Inferior 1 (process 8840) exited normally]
