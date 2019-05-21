@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include <unistd.h>		//getopt()
 #include <getopt.h>		//getopt_long()
@@ -14,7 +15,8 @@
 #define TYPE_LONG_OPTION_WITH_ARG				5
 #define TYPE_LONG_OPTION_WITH_OPTION_ARG		6
 
-#define TYPE_UNRECOGNIZED						0
+#define TYPE_ERROR_MISSING_ARG					-1
+#define TYPE_ERROR_UNKNOW						-2
 void log_command_line_info(int type, const char *name,const char *value);
 
 
@@ -34,27 +36,29 @@ int main(int argc, char *argv[])
 	strcpy(config.language, "en");
 	strcpy(config.color, "deafult");
 
-	//参数解析需要的规则
-	const char *short_options = "vl:c::1:2::";
-	const struct option long_options[] =
-	{
-		{"verbose", no_argument, &config.verbose_flag, 1},
-		{"brief", no_argument, &config.verbose_flag, 0},
-
-		{"language", required_argument, 0, 'l'},
-		{"color", optional_argument, 0, 'c'},
-
-		{"other", required_argument, 0, 256},
-		{0, 0, 0, 0}
-	};
-	//记录getopt_long返回值
-	int long_options_index = 1;
-	int option_return_value = -1;
-
 	while(1)
 	{
-		option_return_value = getopt_long(argc, argv, short_options, long_options, &long_options_index);
+		//参数解析需要的规则
+		const char *short_options = "vl:c::1:2::";
+		const struct option long_options[] =
+		{
+				{"verbose", no_argument, &config.verbose_flag, 1},
+				{"brief", no_argument, &config.verbose_flag, 0},
 
+				{"language", required_argument, 0, 'l'},
+				{"color", optional_argument, 0, 'c'},
+
+				{"other", required_argument, 0, 256},
+				{0, 0, 0, 0}
+		};
+
+		//记录getopt_long返回值
+		int long_options_index = 1;
+		int option_return_value = -1;
+		char short_option_name[3] = {'-', '\0', '\0'};
+		opterr = 0;
+
+		option_return_value = getopt_long(argc, argv, short_options, long_options, &long_options_index);
 		if(option_return_value == -1)
 		{
 			break;
@@ -117,9 +121,40 @@ int main(int argc, char *argv[])
 			break;
 
 		case '?':	//错误
-			log_command_line_info(TYPE_UNRECOGNIZED, "?", NULL);
+
+			if(optopt == 'l' || optopt == '1')
+			{
+				short_option_name[1] = optopt;
+				log_command_line_info(TYPE_ERROR_MISSING_ARG, short_option_name, NULL);
+			}
+			else if(optopt == 256)
+			{
+				log_command_line_info(TYPE_ERROR_MISSING_ARG, "other", NULL);
+			}
+			else if(isprint(optopt))
+			{
+				short_option_name[1] = optopt;
+				log_command_line_info(TYPE_ERROR_UNKNOW, short_option_name, NULL);
+			}
+			else
+			{
+				log_command_line_info(TYPE_ERROR_UNKNOW, NULL, NULL);
+			}
 			break;
 		}
+	}
+
+	//打印系统配置情况
+	printf("the process config info is: \n");
+	printf( "  -verbose_flag = %d.\n"
+			"  -language = %s.\n"
+			"  -color = %s.\n",
+			config.verbose_flag, config.language, config.color);
+
+	//打印非选项参数
+	for(int i = optind; i < argc; i++)
+	{
+		printf("the %d no_option_arg = %s.\n", (int)(i + 1 - optind), argv[i]);
 	}
 }
 
@@ -180,8 +215,11 @@ void log_command_line_info(int type, const char *name, const char *value)
 			printf("INFO: long option with option arg> option=--%s, value=%s. \n", name, value);
 		}
 		break;
+	case TYPE_ERROR_MISSING_ARG:
+		printf("ERROR: the option %s missing argument! \n", name);
+		break;
 
-	case TYPE_UNRECOGNIZED:
+	case TYPE_ERROR_UNKNOW:
 		printf("unknown option %s! \n", name);
 		break;
 
